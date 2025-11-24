@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Category;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 class CategoryController extends Controller
 {
@@ -22,7 +23,7 @@ class CategoryController extends Controller
      */
     public function create()
     {
-        //
+        return view('categories.create');
     }
 
     /**
@@ -30,7 +31,22 @@ class CategoryController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $validated = $request->validate([
+            'name' => 'required|string|max:255|unique:categories', 
+            'description' => 'nullable|string',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+        ]);
+
+        if ($request->hasFile('image')) {
+            $imagePath = $request->file('image')->store('categories', 'public');
+            
+            $validated['image'] = $imagePath;
+        }
+
+        Category::create($validated);
+
+        return redirect()->route('categories.index')
+            ->with('success', 'Kategori berhasil ditambahkan!');
     }
 
     /**
