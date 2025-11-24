@@ -58,26 +58,55 @@ class CategoryController extends Controller
     }
 
     /**
-     * Show the form for editing the specified resource.
+     * Menampilkan form edit dengan data yang sudah ada.
      */
     public function edit(Category $category)
     {
-        //
+        return view('categories.edit', compact('category'));
     }
 
     /**
-     * Update the specified resource in storage.
+     * Memproses update data di database.
      */
     public function update(Request $request, Category $category)
     {
-        //
+        // Nama harus unik, TAPI pengecualian untuk kategori ini sendiri.
+        $validated = $request->validate([
+            'name' => 'required|string|max:255|unique:categories,name,' . $category->id,
+            'description' => 'nullable|string',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+        ]);
+
+        // CEK GAMBAR BARU
+        if ($request->hasFile('image')) {
+            
+            if ($category->image) {
+                Storage::disk('public')->delete($category->image);
+            }
+
+            $imagePath = $request->file('image')->store('categories', 'public');
+            
+            $validated['image'] = $imagePath;
+        }
+
+        $category->update($validated);
+
+        return redirect()->route('categories.index')
+            ->with('success', 'Kategori berhasil diperbarui!');
     }
 
     /**
-     * Remove the specified resource from storage.
+     * Menghapus data dan file gambar.
      */
     public function destroy(Category $category)
     {
-        //
+        if ($category->image) {
+            Storage::disk('public')->delete($category->image);
+        }
+
+        $category->delete();
+
+        return redirect()->route('categories.index')
+            ->with('success', 'Kategori berhasil dihapus!');
     }
 }
