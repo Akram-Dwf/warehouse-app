@@ -35,9 +35,7 @@
                                     </td>
                                     <td class="py-3 px-6 text-left">
                                         @if($category->image)
-                                        <img src="{{ asset('storage/' . $category->image) }}"
-                                            alt="Img"
-                                            style="width: 60px; height: 60px; object-fit: cover; border-radius: 50%;">
+                                        <img src="{{ asset('storage/' . $category->image) }}" alt="Img" style="width: 60px; height: 60px; object-fit: cover; border-radius: 50%;">
                                         @else
                                         <span class="text-gray-400 italic text-xs">No Image</span>
                                         @endif
@@ -56,7 +54,7 @@
 
                                             <span class="text-gray-300">|</span>
 
-                                            <form action="{{ route('categories.destroy', $category) }}" method="POST" class="inline-block" onsubmit="return confirm('Yakin ingin menghapus kategori ini?')">
+                                            <form action="{{ route('categories.destroy', $category) }}" method="POST" class="delete-form inline-block">
                                                 @csrf
                                                 @method('DELETE')
                                                 <button type="submit" class="text-red-600 hover:text-red-900 font-bold">
