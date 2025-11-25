@@ -62,11 +62,11 @@
 
                                     <td class="py-3 px-6 text-center">
                                         @if($product->stock <= $product->min_stock)
-                                            <span class="bg-red-100 text-red-800 text-xs font-bold px-2 py-1 rounded">
+                                            <span style="background-color: #fee2e2; color: #991b1b; padding: 4px 8px; border-radius: 4px; font-size: 12px; font-weight: bold; display: inline-block;">
                                                 {{ $product->stock }} {{ $product->unit }}
                                             </span>
                                             @else
-                                            <span class="bg-green-100 text-green-800 text-xs font-bold px-2 py-1 rounded">
+                                            <span style="background-color: #dcfce7; color: #166534; padding: 4px 8px; border-radius: 4px; font-size: 12px; font-weight: bold; display: inline-block;">
                                                 {{ $product->stock }} {{ $product->unit }}
                                             </span>
                                             @endif
