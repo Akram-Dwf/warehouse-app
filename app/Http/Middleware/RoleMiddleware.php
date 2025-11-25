@@ -15,13 +15,10 @@ class RoleMiddleware
      */
     public function handle(Request $request, Closure $next, $role): Response
     {
-        // Cek user punya jabatan yang sesuai
         $allowedRoles = explode('|', $role);
 
-        // Ambil role user yang sedang login
         $userRole = $request->user()->role;
 
-        // Cek role user ada di dalam daftar yang dibolehkan
         if (in_array($userRole, $allowedRoles)) {
             return $next($request);
         }
