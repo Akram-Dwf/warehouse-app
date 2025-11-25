@@ -100,6 +100,11 @@ class CategoryController extends Controller
      */
     public function destroy(Category $category)
     {
+        if ($category->products()->count() > 0) {
+            return redirect()->back()
+                ->with('error', 'Gagal hapus! Kategori ini masih digunakan oleh produk.');
+        }
+
         if ($category->image) {
             Storage::disk('public')->delete($category->image);
         }
