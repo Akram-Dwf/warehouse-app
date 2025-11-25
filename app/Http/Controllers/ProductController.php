@@ -53,4 +53,64 @@ class ProductController extends Controller
         return redirect()->route('products.index')
             ->with('success', 'Produk berhasil ditambahkan!');
     }
+
+    /**
+     * Menampilkan form edit produk.
+     */
+    public function edit(Product $product)
+    {
+        $categories = Category::all();
+        return view('products.edit', compact('product', 'categories'));
+    }
+
+    /**
+     * Memproses update produk.
+     */
+    public function update(Request $request, Product $product)
+    {
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'category_id' => 'required|exists:categories,id',
+            'description' => 'required|string',
+            'purchase_price' => 'required|numeric|min:0',
+            'selling_price' => 'required|numeric|min:0',
+            'stock' => 'required|integer|min:0',
+            'min_stock' => 'required|integer|min:0',
+            'unit' => 'required|string|max:50',
+            'location' => 'required|string|max:255',
+            'image' => 'nullable|image|max:2048',
+        ]);
+
+        if ($request->hasFile('image')) {
+            if ($product->image) {
+                Storage::disk('public')->delete($product->image);
+            }
+            $validated['image'] = $request->file('image')->store('products', 'public');
+        }
+
+        $product->update($validated);
+
+        return redirect()->route('products.index')
+            ->with('success', 'Produk berhasil diperbarui!');
+    }
+
+    /**
+     * Menghapus produk.
+     */
+    public function destroy(Product $product)
+    {
+        if ($product->stock > 0) {
+            return redirect()->back()
+                ->with('error', 'Gagal hapus! Produk masih memiliki stok ' . $product->stock . ' ' . $product->unit);
+        }
+
+        if ($product->image) {
+            Storage::disk('public')->delete($product->image);
+        }
+
+        $product->delete();
+
+        return redirect()->route('products.index')
+            ->with('success', 'Produk berhasil dihapus!');
+    }
 }
