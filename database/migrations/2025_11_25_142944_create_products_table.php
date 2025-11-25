@@ -14,14 +14,11 @@ return new class extends Migration
         Schema::create('products', function (Blueprint $table) {
             $table->id();
             
-            // 1. Informasi Dasar
             $table->string('name');
             $table->string('sku')->unique();
             
-            // 2. Relasi ke Kategori
             $table->foreignId('category_id')->nullable()->constrained()->onDelete('set null');
 
-            // 3. Detail Fisik & Lokasi
             $table->text('description')->nullable();
             $table->string('unit')->default('pcs');
             $table->string('location')->nullable();
