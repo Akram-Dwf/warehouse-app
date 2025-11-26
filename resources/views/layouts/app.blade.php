@@ -39,7 +39,8 @@
 
         <script>
             document.addEventListener('DOMContentLoaded', function() {
-                // 1. Notifikasi (Toast)
+                
+                // --- 1. NOTIFIKASI (Toast) ---
                 const flashData = document.getElementById('flash-data');
                 const successMsg = flashData.getAttribute('data-success');
                 const errorMsg = flashData.getAttribute('data-error');
@@ -64,7 +65,7 @@
                     });
                 }
 
-                // 2. Konfirmasi Hapus Global
+                // --- 2. KONFIRMASI HAPUS (Delete) ---
                 const deleteForms = document.querySelectorAll('.delete-form');
                 deleteForms.forEach(form => {
                     form.addEventListener('submit', function(e) {
@@ -85,6 +86,51 @@
                         });
                     });
                 });
+
+                // --- 3. KONFIRMASI APPROVE (Setujui) ---
+                const approveForms = document.querySelectorAll('.approve-form');
+                approveForms.forEach(form => {
+                    form.addEventListener('submit', function(e) {
+                        e.preventDefault();
+                        Swal.fire({
+                            title: 'Setujui Transaksi?',
+                            text: "Stok barang akan otomatis diperbarui!",
+                            icon: 'question',
+                            showCancelButton: true,
+                            confirmButtonColor: '#16a34a',
+                            cancelButtonColor: '#6b7280',
+                            confirmButtonText: 'Ya, Setujui!',
+                            cancelButtonText: 'Batal'
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                form.submit();
+                            }
+                        });
+                    });
+                });
+
+                // --- 4. KONFIRMASI REJECT (Tolak) ---
+                const rejectForms = document.querySelectorAll('.reject-form');
+                rejectForms.forEach(form => {
+                    form.addEventListener('submit', function(e) {
+                        e.preventDefault();
+                        Swal.fire({
+                            title: 'Tolak Transaksi?',
+                            text: "Transaksi akan ditandai sebagai Ditolak.",
+                            icon: 'warning',
+                            showCancelButton: true,
+                            confirmButtonColor: '#ef4444',
+                            cancelButtonColor: '#6b7280',
+                            confirmButtonText: 'Ya, Tolak!',
+                            cancelButtonText: 'Batal'
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                form.submit();
+                            }
+                        });
+                    });
+                });
+
             });
         </script>
     </body>
