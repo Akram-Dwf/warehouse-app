@@ -8,11 +8,13 @@ use Illuminate\Http\Request;
 class TransactionController extends Controller
 {
     /**
-     * Display a listing of the resource.
+     * Menampilkan daftar transaksi (Masuk & Keluar).
      */
     public function index()
     {
-        //
+        $transactions = Transaction::with(['user', 'supplier'])->latest()->paginate(10);
+
+        return view('transactions.index', compact('transactions'));
     }
 
     /**

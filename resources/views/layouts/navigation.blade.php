@@ -21,7 +21,7 @@
                         {{ __('Produk') }}
                     </x-nav-link>
 
-                    <x-nav-link href="#" class="opacity-50 cursor-not-allowed" title="Fitur belum dibuat">
+                    <x-nav-link :href="route('transactions.index')" :active="request()->routeIs('transactions.*')">
                         {{ __('Transaksi') }}
                     </x-nav-link>
 
@@ -54,7 +54,7 @@
                             @csrf
 
                             <x-dropdown-link :href="route('logout')"
-                                onclick="event.preventDefault();
+                                    onclick="event.preventDefault();
                                                 this.closest('form').submit();">
                                 {{ __('Log Out') }}
                             </x-dropdown-link>
@@ -80,13 +80,21 @@
             <x-responsive-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
                 {{ __('Dashboard') }}
             </x-responsive-nav-link>
-
+            
             <x-responsive-nav-link :href="route('categories.index')" :active="request()->routeIs('categories.*')">
                 {{ __('Kategori') }}
             </x-responsive-nav-link>
 
             <x-responsive-nav-link :href="route('products.index')" :active="request()->routeIs('products.*')">
                 {{ __('Produk') }}
+            </x-responsive-nav-link>
+
+            <x-responsive-nav-link :href="route('transactions.index')" :active="request()->routeIs('transactions.*')">
+                {{ __('Transaksi') }}
+            </x-responsive-nav-link>
+
+            <x-responsive-nav-link href="#" class="opacity-50">
+                {{ __('Restock') }}
             </x-responsive-nav-link>
         </div>
 
@@ -105,7 +113,7 @@
                     @csrf
 
                     <x-responsive-nav-link :href="route('logout')"
-                        onclick="event.preventDefault();
+                            onclick="event.preventDefault();
                                         this.closest('form').submit();">
                         {{ __('Log Out') }}
                     </x-responsive-nav-link>

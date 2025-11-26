@@ -19,4 +19,14 @@ class Product extends Model
     {
         return $this->belongsTo(Category::class);
     }
+
+    
+    /**
+     * Relasi N:M ke Transaksi
+     */
+    public function transactions(): \Illuminate\Database\Eloquent\Relations\BelongsToMany
+    {
+        return $this->belongsToMany(Transaction::class, 'product_transaction')
+                    ->withPivot('quantity');
+    }
 }

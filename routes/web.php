@@ -4,6 +4,7 @@ use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ProductController;
+use App\Http\Controllers\TransactionController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -23,6 +24,9 @@ Route::middleware('auth')->group(function () {
     // Master Data: Produk (Admin & Manager)
     Route::resource('products', ProductController::class)
         ->middleware('role:admin|manager');
+    // Modul Transaksi (Admin, Manager, Staff)
+    Route::resource('transactions', TransactionController::class)
+        ->middleware('role:admin|manager|staff');
 });
 
 require __DIR__ . '/auth.php';
