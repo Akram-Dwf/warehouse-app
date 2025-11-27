@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\TransactionController;
+use App\Http\Controllers\RestockController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -27,6 +28,9 @@ Route::middleware('auth')->group(function () {
     // Modul Transaksi (Admin, Manager, Staff)
     Route::resource('transactions', TransactionController::class)
         ->middleware('role:admin|manager|staff');
+    // Restock (Admin, Manager & Supplier)
+    Route::resource('restocks', RestockController::class)
+        ->middleware('role:admin|manager|supplier');
 });
 
 require __DIR__ . '/auth.php';

@@ -29,4 +29,13 @@ class Product extends Model
         return $this->belongsToMany(Transaction::class, 'product_transaction')
                     ->withPivot('quantity');
     }
+
+    /**
+     * Relasi N:M ke Restock
+     */
+    public function restocks(): \Illuminate\Database\Eloquent\Relations\BelongsToMany
+    {
+        return $this->belongsToMany(Restock::class, 'product_restock')
+                    ->withPivot('quantity');
+    }
 }

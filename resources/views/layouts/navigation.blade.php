@@ -25,7 +25,7 @@
                         {{ __('Transaksi') }}
                     </x-nav-link>
 
-                    <x-nav-link href="#" class="opacity-50 cursor-not-allowed" title="Fitur belum dibuat">
+                    <x-nav-link :href="route('restocks.index')" :active="request()->routeIs('restocks.*')">
                         {{ __('Restock') }}
                     </x-nav-link>
                 </div>
@@ -93,8 +93,8 @@
                 {{ __('Transaksi') }}
             </x-responsive-nav-link>
 
-            <x-responsive-nav-link href="#" class="opacity-50">
-                {{ __('Restock') }}
+            <x-responsive-nav-link :href="route('restocks.index')" :active="request()->routeIs('restocks.*')">
+                        {{ __('Restock') }}
             </x-responsive-nav-link>
         </div>
 
