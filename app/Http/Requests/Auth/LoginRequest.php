@@ -41,11 +41,24 @@ class LoginRequest extends FormRequest
     {
         $this->ensureIsNotRateLimited();
 
+        // 1. Coba Login dengan Email & Password
         if (! Auth::attempt($this->only('email', 'password'), $this->boolean('remember'))) {
             RateLimiter::hit($this->throttleKey());
 
             throw ValidationException::withMessages([
                 'email' => trans('auth.failed'),
+            ]);
+        }
+
+        // 2. CEK STATUS APPROVAL (LOGIKA BARU)
+        $user = Auth::user();
+        if (! $user->is_approved) {
+            // Jika belum disetujui, paksa logout kembali
+            Auth::logout();
+
+            // Lempar pesan error khusus
+            throw ValidationException::withMessages([
+                'email' => 'Akun Anda belum disetujui oleh Admin. Silakan tunggu verifikasi.',
             ]);
         }
 

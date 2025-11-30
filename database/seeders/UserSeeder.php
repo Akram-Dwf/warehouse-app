@@ -20,6 +20,7 @@ class UserSeeder extends Seeder
             'email' => 'admin@gudang.com',
             'role' => 'admin',
             'password' => Hash::make('password'),
+            'is_approved' => true,
         ]);
 
         // 2. Akun Warehouse Manager (Kepala Gudang)
@@ -28,6 +29,7 @@ class UserSeeder extends Seeder
             'email' => 'manager@gudang.com',
             'role' => 'manager',
             'password' => Hash::make('password'),
+            'is_approved' => true,
         ]);
 
         // 3. Akun Staff Gudang (Pekerja)
@@ -36,6 +38,15 @@ class UserSeeder extends Seeder
             'email' => 'staff@gudang.com',
             'role' => 'staff',
             'password' => Hash::make('password'),
+            'is_approved' => true,
+        ]);
+
+        User::create([
+            'name' => 'Staff Gudang 2',
+            'email' => 'staff2@gudang.com',
+            'role' => 'staff',
+            'password' => Hash::make('password'),
+            'is_approved' => true,
         ]);
 
         // 4. Akun Supplier (Contoh Mitra)
@@ -44,6 +55,7 @@ class UserSeeder extends Seeder
             'email' => 'supplier@pt.com',
             'role' => 'supplier',
             'password' => Hash::make('password'),
+            'is_approved' => true,
         ]);
     }
 }

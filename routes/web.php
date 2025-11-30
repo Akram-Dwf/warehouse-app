@@ -6,6 +6,7 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\TransactionController;
 use App\Http\Controllers\RestockController;
+use App\Http\Controllers\UserController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -31,6 +32,9 @@ Route::middleware('auth')->group(function () {
     // Restock (Admin, Manager & Supplier)
     Route::resource('restocks', RestockController::class)
         ->middleware('role:admin|manager|supplier');
+    // Manajemen User (Hanya Admin)
+    Route::resource('users', UserController::class)
+        ->middleware('role:admin');
 });
 
 require __DIR__ . '/auth.php';
