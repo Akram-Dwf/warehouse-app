@@ -28,7 +28,8 @@
                         </div>
                     @endif
 
-                    <form action="{{ route('transactions.store') }}" method="POST" id="transactionForm">
+                    <form action="{{ route('transactions.store') }}" method="POST" id="transactionForm"
+                          data-row-count="{{ $restock ? $restock->products->count() : 1 }}">
                         @csrf
 
                         @if($restock)
@@ -159,7 +160,6 @@
     </div>
 
     <script>
-        // 1. LOGIKA GANTI TIPE
         function toggleType() {
             const type = document.getElementById('type').value;
             const supplierField = document.getElementById('supplier_field');
@@ -177,7 +177,9 @@
         document.addEventListener('DOMContentLoaded', function() {
             toggleType();
             
-            let rowCount = {{ $restock ? $restock->products->count() : 1 }}; // Mulai hitungan dari jumlah produk restock
+            const form = document.getElementById('transactionForm');
+            
+            let rowCount = parseInt(form.getAttribute('data-row-count')) || 1;
 
             document.getElementById('add_row').addEventListener('click', function() {
                 const tableBody = document.getElementById('product_list');
