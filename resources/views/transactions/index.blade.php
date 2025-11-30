@@ -31,69 +31,76 @@
                             </thead>
                             <tbody class="text-gray-600 text-sm font-light">
                                 @forelse ($transactions as $trx)
-                                <tr class="border-b border-gray-200 hover:bg-gray-50">
-                                    <td class="py-3 px-6 text-left whitespace-nowrap">
-                                        {{ \Carbon\Carbon::parse($trx->date)->format('d M Y') }}
-                                    </td>
+                                    <tr class="border-b border-gray-200 hover:bg-gray-50">
+                                        <td class="py-3 px-6 text-left whitespace-nowrap">
+                                            {{ \Carbon\Carbon::parse($trx->date)->format('d M Y') }}
+                                        </td>
+                                        
+                                        <td class="py-3 px-6 text-left font-mono font-bold">
+                                            {{ $trx->reference_number }}
+                                        </td>
 
-                                    <td class="py-3 px-6 text-left font-mono font-bold">
-                                        {{ $trx->reference_number }}
-                                    </td>
-
-                                    <td class="py-3 px-6 text-left">
-                                        @if($trx->type == 'incoming')
-                                        <span class="bg-blue-100 text-blue-800 text-xs font-medium px-2.5 py-0.5 rounded border border-blue-400">
-                                            Masuk (In)
-                                        </span>
-                                        @else
-                                        <span class="bg-orange-100 text-orange-800 text-xs font-medium px-2.5 py-0.5 rounded border border-orange-400">
-                                            Keluar (Out)
-                                        </span>
-                                        @endif
-                                    </td>
-
-                                    <td class="py-3 px-6 text-left">
-                                        @if($trx->type == 'incoming')
-                                        <span class="font-semibold text-gray-700">{{ $trx->supplier->name ?? '-' }}</span>
-                                        @else
-                                        <span class="font-semibold text-gray-700">{{ $trx->customer_name ?? 'Umum' }}</span>
-                                        @endif
-                                    </td>
-
-                                    <td class="py-3 px-6 text-center">
-                                        @if($trx->status == 'approved')
-                                        <span class="bg-green-100 text-green-800 text-xs font-bold px-2 py-1 rounded">Selesai</span>
-                                        @elseif($trx->status == 'rejected')
-                                        <span class="bg-red-100 text-red-800 text-xs font-bold px-2 py-1 rounded">Ditolak</span>
-                                        @else
-                                        <span class="bg-yellow-100 text-yellow-800 text-xs font-bold px-2 py-1 rounded">Pending</span>
-                                        @endif
-                                    </td>
-
-                                    <td class="py-3 px-6 text-center">
-                                        <div class="flex item-center justify-center gap-3">
-                                            <a href="{{ route('transactions.show', $trx) }}" class="text-blue-500 hover:text-blue-700 transform hover:scale-110 transition" title="Lihat Detail">
-                                                <i class="fas fa-eye"></i>
-                                            </a>
-
-                                            @if($trx->status == 'pending')
-                                            <form action="{{ route('transactions.destroy', $trx) }}" method="POST" class="delete-form inline-block">
-                                                @csrf
-                                                @method('DELETE')
-                                                <button type="submit" class="text-red-500 hover:text-red-700 transform hover:scale-110 transition" title="Hapus">
-                                                    <i class="fas fa-trash-alt"></i>
-                                                </button>
-                                            </form>
+                                        <td class="py-3 px-6 text-left">
+                                            @if($trx->type == 'incoming')
+                                                <span class="bg-blue-100 text-blue-800 text-xs font-medium px-2.5 py-0.5 rounded border border-blue-400">
+                                                    Masuk (In)
+                                                </span>
+                                            @else
+                                                <span class="bg-orange-100 text-orange-800 text-xs font-medium px-2.5 py-0.5 rounded border border-orange-400">
+                                                    Keluar (Out)
+                                                </span>
                                             @endif
-                                        </div>
-                                    </td>
-                                </tr>
+                                        </td>
+
+                                        <td class="py-3 px-6 text-left">
+                                            @if($trx->type == 'incoming')
+                                                <span class="font-semibold text-gray-700">{{ $trx->supplier->name ?? '-' }}</span>
+                                            @else
+                                                <span class="font-semibold text-gray-700">{{ $trx->customer_name ?? 'Umum' }}</span>
+                                            @endif
+                                        </td>
+
+                                        <td class="py-3 px-6 text-center">
+                                            @if($trx->status == 'approved')
+                                                <span class="bg-green-100 text-green-800 text-xs font-bold px-2 py-1 rounded">Selesai</span>
+                                            @elseif($trx->status == 'rejected')
+                                                <span class="bg-red-100 text-red-800 text-xs font-bold px-2 py-1 rounded">Ditolak</span>
+                                            @else
+                                                <span class="bg-yellow-100 text-yellow-800 text-xs font-bold px-2 py-1 rounded">Pending</span>
+                                            @endif
+                                        </td>
+
+                                        <td class="py-3 px-6 text-center">
+                                            <div class="flex item-center justify-center gap-3">
+                                                
+                                                <a href="{{ route('transactions.show', $trx) }}" class="text-blue-500 hover:text-blue-700 transform hover:scale-110 transition" title="Lihat Detail">
+                                                    <i class="fas fa-eye"></i>
+                                                </a>
+
+                                                @if($trx->status == 'pending')
+                                                    <a href="{{ route('transactions.edit', $trx) }}" class="text-yellow-500 hover:text-yellow-700 transform hover:scale-110 transition" title="Edit Transaksi">
+                                                        <i class="fas fa-pencil-alt"></i>
+                                                    </a>
+                                                @endif
+
+                                                @if($trx->status == 'pending')
+                                                    <form action="{{ route('transactions.destroy', $trx) }}" method="POST" class="delete-form inline-block">
+                                                        @csrf
+                                                        @method('DELETE')
+                                                        <button type="submit" class="text-red-500 hover:text-red-700 transform hover:scale-110 transition" title="Hapus">
+                                                            <i class="fas fa-trash-alt"></i>
+                                                        </button>
+                                                    </form>
+                                                @endif
+                                            </div>
+                                        </td>
+                                    </tr>
                                 @empty
-                                <tr>
-                                    <td colspan="6" class="py-6 text-center text-gray-500 bg-gray-50">
-                                        Belum ada transaksi.
-                                    </td>
-                                </tr>
+                                    <tr>
+                                        <td colspan="6" class="py-6 text-center text-gray-500 bg-gray-50">
+                                            Belum ada transaksi.
+                                        </td>
+                                    </tr>
                                 @endforelse
                             </tbody>
                         </table>

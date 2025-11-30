@@ -93,7 +93,86 @@ class TransactionController extends Controller
         return view('transactions.show', compact('transaction'));
     }
 
+    /**
+     * Menampilkan form edit transaksi (Hanya jika status Pending).
+     */
+    public function edit(Transaction $transaction)
+    {
+        if ($transaction->status !== 'pending') {
+            return redirect()->route('transactions.index')
+                ->with('error', 'Transaksi yang sudah diproses tidak dapat diedit.');
+        }
+
+        $user = Auth::user();
+        if ($user->role == 'staff' && $transaction->user_id !== $user->id) {
+            return redirect()->route('transactions.index')
+                ->with('error', 'Anda tidak memiliki izin mengedit transaksi orang lain.');
+        }
+
+        $products = Product::all();
+        
+        $transaction->load('products');
+
+        return view('transactions.edit', compact('transaction', 'products'));
+    }
+
+    /**
+     * Memproses update transaksi.
+     */
     public function update(Request $request, Transaction $transaction)
+    {
+        if ($request->has('status')) {
+            return $this->processApproval($request, $transaction);
+        }
+
+        // --- LOGIKA EDIT DATA (Staff) ---
+
+        if ($transaction->status !== 'pending') {
+            return redirect()->back()->with('error', 'Gagal! Transaksi sudah diproses.');
+        }
+
+        $validated = $request->validate([
+            'notes' => 'nullable|string',
+            'products' => 'required|array|min:1',
+            'products.*.id' => 'required|exists:products,id',
+            'products.*.quantity' => 'required|integer|min:1',
+        ]);
+
+        try {
+            DB::beginTransaction();
+
+            $transaction->update([
+                'notes' => $validated['notes']
+            ]);
+
+            $syncData = [];
+            foreach ($validated['products'] as $item) {
+                if (isset($syncData[$item['id']])) {
+                    $syncData[$item['id']]['quantity'] += $item['quantity'];
+                } else {
+                    $syncData[$item['id']] = ['quantity' => $item['quantity']];
+                }
+            }
+            
+            $transaction->products()->sync($syncData);
+
+            DB::commit();
+
+            return redirect()->route('transactions.index')
+                ->with('success', 'Perubahan transaksi berhasil disimpan!');
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return redirect()->back()
+                ->with('error', 'Terjadi kesalahan: ' . $e->getMessage())
+                ->withInput();
+        }
+    }
+
+    /**
+     * Helper method untuk memisahkan logika Approval (Manager)
+     */
+    private function processApproval(Request $request, Transaction $transaction)
     {
         $request->validate(['status' => 'required|in:approved,rejected']);
 
