@@ -47,7 +47,11 @@ class DashboardController extends Controller
                 ->whereDate('created_at', Carbon::today())
                 ->latest()
                 ->get();
-                
+            
+            $data['restocks_to_process'] = Restock::where('status', 'received')
+                ->doesntHave('transaction')
+                ->get();
+
             return view('dashboard.staff', compact('data'));
         } 
         

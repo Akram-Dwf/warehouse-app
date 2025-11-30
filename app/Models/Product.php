@@ -13,7 +13,7 @@ class Product extends Model
     protected $guarded = ['id'];
 
     /**
-     * Relasi: Satu Produk dimiliki oleh Satu Kategori
+     * Relasi ke Kategori
      */
     public function category(): BelongsTo
     {

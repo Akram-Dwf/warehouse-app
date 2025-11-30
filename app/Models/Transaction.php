@@ -28,4 +28,9 @@ class Transaction extends Model
         return $this->belongsToMany(Product::class, 'product_transaction')
                     ->withPivot('quantity');
     }
+
+    public function restock(): BelongsTo
+    {
+        return $this->belongsTo(Restock::class);
+    }
 }

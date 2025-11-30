@@ -29,4 +29,9 @@ class Restock extends Model
         return $this->belongsToMany(Product::class, 'product_restock')
                     ->withPivot('quantity');
     }
+
+    public function transaction(): \Illuminate\Database\Eloquent\Relations\HasOne
+    {
+        return $this->hasOne(Transaction::class);
+    }
 }

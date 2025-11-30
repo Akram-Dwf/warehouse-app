@@ -10,8 +10,30 @@
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-6 text-gray-900">
 
+                    @if($restock)
+                        <div class="bg-blue-50 border-l-4 border-blue-500 p-4 mb-6">
+                            <div class="flex">
+                                <div class="flex-shrink-0">
+                                    <svg class="h-5 w-5 text-blue-400" viewBox="0 0 20 20" fill="currentColor">
+                                        <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd" />
+                                    </svg>
+                                </div>
+                                <div class="ml-3">
+                                    <p class="text-sm text-blue-700">
+                                        Form ini diisi otomatis berdasarkan <strong>Restock #{{ $restock->po_number }}</strong>.
+                                        Silakan cek fisik barang dan sesuaikan jumlah jika perlu.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    @endif
+
                     <form action="{{ route('transactions.store') }}" method="POST" id="transactionForm">
                         @csrf
+
+                        @if($restock)
+                            <input type="hidden" name="restock_id" value="{{ $restock->id }}">
+                        @endif
 
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
                             
@@ -24,7 +46,7 @@
                                 <div>
                                     <label class="block text-sm font-medium text-gray-700">Tipe Transaksi</label>
                                     <select name="type" id="type" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500" required onchange="toggleType()">
-                                        <option value="incoming">Barang Masuk (Incoming)</option>
+                                        <option value="incoming" {{ $restock ? 'selected' : '' }}>Barang Masuk (Incoming)</option>
                                         <option value="outgoing">Barang Keluar (Outgoing)</option>
                                     </select>
                                 </div>
@@ -34,7 +56,10 @@
                                     <select name="supplier_id" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
                                         <option value="">-- Pilih Supplier --</option>
                                         @foreach($suppliers as $supplier)
-                                            <option value="{{ $supplier->id }}">{{ $supplier->name }}</option>
+                                            <option value="{{ $supplier->id }}" 
+                                                {{ ($restock && $restock->supplier_id == $supplier->id) ? 'selected' : '' }}>
+                                                {{ $supplier->name }}
+                                            </option>
                                         @endforeach
                                     </select>
                                 </div>
@@ -47,7 +72,7 @@
 
                             <div>
                                 <label class="block text-sm font-medium text-gray-700">Catatan (Opsional)</label>
-                                <textarea name="notes" rows="4" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500" placeholder="Tambahkan catatan jika perlu..."></textarea>
+                                <textarea name="notes" rows="4" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500" placeholder="Tambahkan catatan jika perlu...">{{ $restock ? 'Penerimaan barang dari PO: ' . $restock->po_number : '' }}</textarea>
                             </div>
                         </div>
 
@@ -65,26 +90,50 @@
                                     </tr>
                                 </thead>
                                 <tbody id="product_list">
-                                    <tr class="border-t product-row">
-                                        <td class="px-4 py-2">
-                                            <select name="products[0][id]" class="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 product-select" required>
-                                                <option value="">-- Pilih Produk --</option>
-                                                @foreach($products as $product)
-                                                    <option value="{{ $product->id }}">
-                                                        {{ $product->name }} (Stok: {{ $product->stock }})
-                                                    </option>
-                                                @endforeach
-                                            </select>
-                                        </td>
-                                        <td class="px-4 py-2">
-                                            <input type="number" name="products[0][quantity]" min="1" value="1" class="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 quantity-input" required>
-                                        </td>
-                                        <td class="px-4 py-2 text-center">
-                                            <button type="button" class="text-red-500 hover:text-red-700 remove-row" disabled>
-                                                <i class="fas fa-trash"></i>
-                                            </button>
-                                        </td>
-                                    </tr>
+                                    
+                                    @if($restock && $restock->products->count() > 0)
+                                        @foreach($restock->products as $index => $item)
+                                            <tr class="border-t product-row">
+                                                <td class="px-4 py-2">
+                                                    <select name="products[{{ $index }}][id]" class="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 product-select" required>
+                                                        <option value="{{ $item->id }}" selected>
+                                                            {{ $item->name }} (Stok: {{ $item->stock }})
+                                                        </option>
+                                                    </select>
+                                                </td>
+                                                <td class="px-4 py-2">
+                                                    <input type="number" name="products[{{ $index }}][quantity]" min="1" value="{{ $item->pivot->quantity }}" class="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 quantity-input" required>
+                                                </td>
+                                                <td class="px-4 py-2 text-center">
+                                                    <button type="button" class="text-red-500 hover:text-red-700 remove-row">
+                                                        <i class="fas fa-trash"></i>
+                                                    </button>
+                                                </td>
+                                            </tr>
+                                        @endforeach
+                                    @else
+                                        <tr class="border-t product-row">
+                                            <td class="px-4 py-2">
+                                                <select name="products[0][id]" class="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 product-select" required>
+                                                    <option value="">-- Pilih Produk --</option>
+                                                    @foreach($products as $product)
+                                                        <option value="{{ $product->id }}">
+                                                            {{ $product->name }} (Stok: {{ $product->stock }})
+                                                        </option>
+                                                    @endforeach
+                                                </select>
+                                            </td>
+                                            <td class="px-4 py-2">
+                                                <input type="number" name="products[0][quantity]" min="1" value="1" class="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 quantity-input" required>
+                                            </td>
+                                            <td class="px-4 py-2 text-center">
+                                                <button type="button" class="text-red-500 hover:text-red-700 remove-row" disabled>
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    @endif
+
                                 </tbody>
                             </table>
                         </div>
@@ -110,7 +159,7 @@
     </div>
 
     <script>
-        // 1. LOGIKA GANTI TIPE (INCOMING/OUTGOING)
+        // 1. LOGIKA GANTI TIPE
         function toggleType() {
             const type = document.getElementById('type').value;
             const supplierField = document.getElementById('supplier_field');
@@ -126,35 +175,46 @@
         }
 
         document.addEventListener('DOMContentLoaded', function() {
-            let rowCount = 1;
+            toggleType();
+            
+            let rowCount = {{ $restock ? $restock->products->count() : 1 }}; // Mulai hitungan dari jumlah produk restock
 
-            // 2. LOGIKA TAMBAH BARIS
             document.getElementById('add_row').addEventListener('click', function() {
                 const tableBody = document.getElementById('product_list');
-                const firstRow = tableBody.querySelector('tr');
-                const newRow = firstRow.cloneNode(true);
+                
+                const newRowHtml = `
+                    <tr class="border-t product-row">
+                        <td class="px-4 py-2">
+                            <select name="products[${rowCount}][id]" class="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 product-select" required>
+                                <option value="">-- Pilih Produk --</option>
+                                @foreach($products as $product)
+                                    <option value="{{ $product->id }}">
+                                        {{ $product->name }} (Stok: {{ $product->stock }})
+                                    </option>
+                                @endforeach
+                            </select>
+                        </td>
+                        <td class="px-4 py-2">
+                            <input type="number" name="products[${rowCount}][quantity]" min="1" value="1" class="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 quantity-input" required>
+                        </td>
+                        <td class="px-4 py-2 text-center">
+                            <button type="button" class="text-red-500 hover:text-red-700 remove-row" onclick="this.closest('tr').remove()">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </td>
+                    </tr>
+                `;
 
-                // Reset nilai input di baris baru
-                const inputs = newRow.querySelectorAll('input, select');
-                inputs.forEach(input => {
-                    input.value = '';
-                    if (input.name.includes('[id]')) {
-                        input.name = `products[${rowCount}][id]`;
-                    } else if (input.name.includes('[quantity]')) {
-                        input.name = `products[${rowCount}][quantity]`;
-                        input.value = 1;
+                tableBody.insertAdjacentHTML('beforeend', newRowHtml);
+                rowCount++;
+            });
+
+            document.querySelectorAll('.remove-row').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    if (document.querySelectorAll('.product-row').length > 1) {
+                        this.closest('tr').remove();
                     }
                 });
-
-                // Aktifkan tombol hapus di baris baru
-                const removeBtn = newRow.querySelector('.remove-row');
-                removeBtn.disabled = false;
-                removeBtn.onclick = function() {
-                    newRow.remove();
-                };
-
-                tableBody.appendChild(newRow);
-                rowCount++;
             });
         });
     </script>

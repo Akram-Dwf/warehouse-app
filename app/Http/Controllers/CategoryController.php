@@ -70,14 +70,12 @@ class CategoryController extends Controller
      */
     public function update(Request $request, Category $category)
     {
-        // Nama harus unik, TAPI pengecualian untuk kategori ini sendiri.
         $validated = $request->validate([
             'name' => 'required|string|max:255|unique:categories,name,' . $category->id,
             'description' => 'nullable|string',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
 
-        // CEK GAMBAR BARU
         if ($request->hasFile('image')) {
             
             if ($category->image) {
