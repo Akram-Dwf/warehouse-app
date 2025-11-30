@@ -4,13 +4,11 @@ namespace App\Http\Controllers;
 
 use App\Models\User;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth; // 1. Tambahkan Import ini
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
 
 class UserController extends Controller
 {
-    /**
-     * Menampilkan daftar user.
-     */
     public function index()
     {
         $users = User::orderBy('is_approved', 'asc')
@@ -21,21 +19,70 @@ class UserController extends Controller
     }
 
     /**
-     * Menyetujui (Approve) User.
+     * Menampilkan form edit user.
      */
-    public function update(Request $request, User $user)
+    public function edit(User $user)
     {
-        $user->update([
-            'is_approved' => true
-        ]);
-
-        return redirect()->back()
-            ->with('success', 'Akun ' . $user->name . ' berhasil disetujui!');
+        return view('users.edit', compact('user'));
     }
 
     /**
-     * Menghapus User (Tolak/Banned).
+     * Update data user (Bisa untuk Approve ATAU Edit Profil).
      */
+    public function update(Request $request, User $user)
+    {
+        if ($request->has('approve_action')) {
+            $user->update(['is_approved' => true]);
+            return redirect()->back()->with('success', 'Akun ' . $user->name . ' berhasil disetujui!');
+        }
+
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|string|email|max:255|unique:users,email,' . $user->id,
+            'role' => 'required|in:admin,manager,staff,supplier',
+            'password' => 'nullable|string|min:8|confirmed',
+        ]);
+
+        $user->name = $validated['name'];
+        $user->email = $validated['email'];
+        $user->role = $validated['role'];
+
+        if ($request->filled('password')) {
+            $user->password = Hash::make($validated['password']);
+        }
+
+        $user->save();
+
+        return redirect()->route('users.index')
+            ->with('success', 'Data pengguna berhasil diperbarui!');
+    }
+
+    public function create()
+    {
+        return view('users.create');
+    }
+
+    public function store(Request $request)
+    {
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|string|email|max:255|unique:users',
+            'password' => 'required|string|min:8|confirmed',
+            'role' => 'required|in:admin,manager,staff,supplier',
+        ]);
+
+        User::create([
+            'name' => $request->name,
+            'email' => $request->email,
+            'password' => Hash::make($request->password),
+            'role' => $request->role,
+            'is_approved' => true, 
+        ]);
+
+        return redirect()->route('users.index')
+            ->with('success', 'Pengguna baru berhasil ditambahkan!');
+    }
+
     public function destroy(User $user)
     {
         if ($user->id == Auth::id()) {
@@ -44,7 +91,6 @@ class UserController extends Controller
 
         $user->delete();
 
-        return redirect()->back()
-            ->with('success', 'Akun berhasil dihapus/ditolak.');
+        return redirect()->back()->with('success', 'Akun berhasil dihapus/ditolak.');
     }
 }

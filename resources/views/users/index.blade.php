@@ -10,7 +10,12 @@
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-6 text-gray-900">
 
-                    <h3 class="text-lg font-medium text-gray-900 mb-4">Daftar Pengguna Sistem</h3>
+                    <div class="flex justify-between items-center mb-6">
+                        <h3 class="text-lg font-medium text-gray-900">Daftar Pengguna Sistem</h3>
+                        <a href="{{ route('users.create') }}" class="inline-flex items-center px-4 py-2 bg-blue-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-blue-700 focus:bg-blue-700 active:bg-blue-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition ease-in-out duration-150">
+                            + Tambah User Baru
+                        </a>
+                    </div>
 
                     <div class="overflow-x-auto">
                         <table class="min-w-full bg-white border border-gray-200 rounded-lg">
@@ -59,21 +64,27 @@
                                             <div class="flex item-center justify-center gap-2">
                                                 
                                                 @if(!$user->is_approved)
-                                                    <form action="{{ route('users.update', $user) }}" method="POST" class="approve-user-form">
+                                                    <form action="{{ route('users.update', $user) }}" method="POST" class="approve-user-form inline-block">
                                                         @csrf
                                                         @method('PUT')
-                                                        <button type="submit" class="w-6 h-6 text-green-500 hover:text-green-700 transform hover:scale-110" title="Setujui User Ini">
+                                                        <input type="hidden" name="approve_action" value="1">
+                                                        
+                                                        <button type="submit" class="text-green-500 hover:text-green-700 transform hover:scale-110 transition" title="Setujui User Ini">
                                                             <i class="fas fa-check-circle fa-lg"></i>
                                                         </button>
                                                     </form>
+                                                @else
+                                                    <a href="{{ route('users.edit', $user) }}" class="text-yellow-500 hover:text-yellow-700 transform hover:scale-110 transition" title="Edit User">
+                                                        <i class="fas fa-pencil-alt fa-lg"></i>
+                                                    </a>
                                                 @endif
 
                                                 @if(Auth::id() !== $user->id)
-                                                    <form action="{{ route('users.destroy', $user) }}" method="POST" class="delete-form">
+                                                    <form action="{{ route('users.destroy', $user) }}" method="POST" class="delete-form inline-block">
                                                         @csrf
                                                         @method('DELETE')
-                                                        <button type="submit" class="w-6 h-6 text-red-500 hover:text-red-700 transform hover:scale-110" title="Hapus User">
-                                                            <i class="fas fa-trash-alt"></i>
+                                                        <button type="submit" class="text-red-500 hover:text-red-700 transform hover:scale-110 transition" title="Hapus User">
+                                                            <i class="fas fa-trash-alt fa-lg"></i>
                                                         </button>
                                                     </form>
                                                 @endif
