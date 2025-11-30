@@ -139,7 +139,8 @@ class TransactionController extends Controller
 
         $user = Auth::user();
         if ($user->role == 'staff' && $transaction->user_id !== $user->id) {
-            abort(403, 'Anda tidak memiliki izin menghapus transaksi orang lain.');
+            return redirect()->back()
+                ->with('error', 'AKSES DITOLAK: Anda tidak memiliki izin menghapus transaksi milik orang lain.');
         }
 
         $transaction->delete();
