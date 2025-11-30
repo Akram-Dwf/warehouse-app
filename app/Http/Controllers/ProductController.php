@@ -32,19 +32,18 @@ class ProductController extends Controller
         $validated = $request->validate([
             'sku' => 'required|string|max:255|unique:products,sku',
             'name' => 'required|string|max:255',
-            'category_id' => 'required|exists:categories,id',
-            'description' => 'required|string',
+            'category_id' => 'nullable|exists:categories,id',
+            'description' => 'nullable|string',
             'purchase_price' => 'required|numeric|min:0',
             'selling_price' => 'required|numeric|min:0',
             'stock' => 'required|integer|min:0',
             'min_stock' => 'required|integer|min:0',
             'unit' => 'required|string|max:50',
-            'location' => 'required|string|max:255',
-            'image' => 'required|image|max:2048',
+            'location' => 'nullable|string|max:255',
+            'image' => 'nullable|image|max:2048',
         ]);
 
         if ($request->hasFile('image')) {
-            // Simpan di folder 'public/products'
             $validated['image'] = $request->file('image')->store('products', 'public');
         }
 
@@ -52,6 +51,22 @@ class ProductController extends Controller
 
         return redirect()->route('products.index')
             ->with('success', 'Produk berhasil ditambahkan!');
+    }
+
+    /**
+     * Menampilkan detail produk beserta riwayat transaksinya.
+     */
+    public function show(Product $product)
+    {
+        $product->load('category');
+
+        $lastTransactions = $product->transactions()
+                                    ->with('user')
+                                    ->latest()
+                                    ->take(5)
+                                    ->get();
+
+        return view('products.show', compact('product', 'lastTransactions'));
     }
 
     /**
@@ -70,14 +85,14 @@ class ProductController extends Controller
     {
         $validated = $request->validate([
             'name' => 'required|string|max:255',
-            'category_id' => 'required|exists:categories,id',
-            'description' => 'required|string',
+            'category_id' => 'nullable|exists:categories,id',
+            'description' => 'nullable|string',
             'purchase_price' => 'required|numeric|min:0',
             'selling_price' => 'required|numeric|min:0',
             'stock' => 'required|integer|min:0',
             'min_stock' => 'required|integer|min:0',
             'unit' => 'required|string|max:50',
-            'location' => 'required|string|max:255',
+            'location' => 'nullable|string|max:255',
             'image' => 'nullable|image|max:2048',
         ]);
 

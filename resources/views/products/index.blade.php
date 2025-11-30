@@ -74,6 +74,11 @@
 
                                     <td class="py-3 px-6 text-center">
                                         <div class="flex item-center justify-center gap-3">
+
+                                            <a href="{{ route('products.show', $product) }}" class="text-blue-500 hover:text-blue-700 transform hover:scale-110 transition" title="Lihat Detail">
+                                                <i class="fas fa-eye"></i>
+                                            </a>
+
                                             <a href="{{ route('products.edit', $product) }}" class="text-yellow-500 hover:text-yellow-700 transform hover:scale-110 transition" title="Edit">
                                                 <i class="fas fa-pencil-alt"></i>
                                             </a>
