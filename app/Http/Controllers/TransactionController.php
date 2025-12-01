@@ -12,9 +12,16 @@ use Illuminate\Support\Facades\Auth;
 
 class TransactionController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $transactions = Transaction::with(['user', 'supplier'])->latest()->paginate(10);
+        $query = Transaction::with(['user', 'supplier']);
+
+        if ($request->has('type') && in_array($request->type, ['incoming', 'outgoing'])) {
+            $query->where('type', $request->type);
+        }
+
+        $transactions = $query->latest()->paginate(10);
+
         return view('transactions.index', compact('transactions'));
     }
 
