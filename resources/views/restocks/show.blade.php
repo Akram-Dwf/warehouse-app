@@ -83,42 +83,86 @@
                 @if(Auth::user()->role == 'supplier' && $restock->status == 'pending')
                     <p class="text-gray-600 mb-4">Pesanan ini menunggu konfirmasi Anda.</p>
                     <div class="flex gap-3">
-                        <form action="{{ route('restocks.update', $restock) }}" method="POST" class="action-form">
+                        <form action="{{ route('restocks.update', $restock) }}" method="POST" 
+                              class="confirm-form" 
+                              data-title="Konfirmasi Pesanan?" 
+                              data-text="Pesanan akan ditandai sebagai Disetujui." 
+                              data-color="#16a34a">
                             @csrf @method('PUT')
                             <input type="hidden" name="status" value="confirmed">
-                            <button type="submit" style="background-color: #16a34a; color: white; padding: 8px 16px; border-radius: 6px; font-weight: bold;">
+                            <button type="submit" style="background-color: #16a34a;" class="px-4 py-2 text-white rounded font-bold hover:opacity-90">
                                 ✔ Konfirmasi Pesanan
                             </button>
                         </form>
-                        <form action="{{ route('restocks.update', $restock) }}" method="POST" class="action-form">
+                        
+                        <form action="{{ route('restocks.update', $restock) }}" method="POST" 
+                              class="confirm-form"
+                              data-title="Tolak Pesanan?" 
+                              data-text="Pesanan akan ditandai sebagai Ditolak." 
+                              data-color="#dc2626">
                             @csrf @method('PUT')
                             <input type="hidden" name="status" value="rejected">
-                            <button type="submit" style="background-color: #dc2626; color: white; padding: 8px 16px; border-radius: 6px; font-weight: bold;">
+                            <button type="submit" style="background-color: #dc2626;" class="px-4 py-2 text-white rounded font-bold hover:opacity-90">
                                 ✖ Tolak Pesanan
                             </button>
                         </form>
                     </div>
 
-                @elseif(Auth::user()->role == 'manager' && $restock->status == 'confirmed')
-                    <p class="text-gray-600 mb-4">Supplier telah mengonfirmasi. Klik tombol di bawah jika barang sudah dikirim.</p>
-                    <form action="{{ route('restocks.update', $restock) }}" method="POST" class="action-form">
-                        @csrf @method('PUT')
-                        <input type="hidden" name="status" value="in_transit">
-                        <button type="submit" style="background-color: #9333ea; color: white; padding: 8px 16px; border-radius: 6px; font-weight: bold;">
-                            🚚 Barang Dikirim (In Transit)
-                        </button>
-                    </form>
+                @elseif((Auth::user()->role == 'manager' || Auth::user()->role == 'admin'))
+                    
+                    @if(in_array($restock->status, ['confirmed', 'in_transit', 'received']))
+                        <p class="text-gray-600 mb-4">
+                            Kelola status pengiriman barang dari Supplier.
+                        </p>
+                        <div class="flex gap-4">
+                            
+                            @if($restock->status == 'confirmed')
+                                <form action="{{ route('restocks.update', $restock) }}" method="POST" 
+                                      class="confirm-form"
+                                      data-title="Kirim Barang?" 
+                                      data-text="Status akan diubah menjadi SEDANG DIKIRIM." 
+                                      data-color="#9333ea">
+                                    @csrf @method('PUT')
+                                    <input type="hidden" name="status" value="in_transit">
+                                    <button type="submit" style="background-color: #9333ea;" class="px-4 py-2 text-white rounded font-bold hover:opacity-90">
+                                        🚚 Update: Sedang Dikirim
+                                    </button>
+                                </form>
+                            @else
+                                <button type="button" style="background-color: #d1d5db; cursor: not-allowed;" class="px-4 py-2 text-gray-500 rounded font-bold" disabled>
+                                    🚚 Sedang Dikirim
+                                </button>
+                            @endif
 
-                @elseif(Auth::user()->role == 'manager' && $restock->status == 'in_transit')
-                    <p class="text-gray-600 mb-4">Barang sedang dikirim. Klik tombol di bawah jika barang sudah sampai di gudang.</p>
-                    <form action="{{ route('restocks.update', $restock) }}" method="POST" class="action-form">
-                        @csrf @method('PUT')
-                        <input type="hidden" name="status" value="received">
-                        <button type="submit" style="background-color: #16a34a; color: white; padding: 8px 16px; border-radius: 6px; font-weight: bold;">
-                            📦 Barang Diterima (Received)
-                        </button>
-                    </form>
-                    <p class="text-xs text-red-500 mt-2">*Stok fisik tidak bertambah otomatis. Harap buat Transaksi Masuk setelah ini.</p>
+                            @if($restock->status == 'in_transit')
+                                <form action="{{ route('restocks.update', $restock) }}" method="POST" 
+                                      class="confirm-form"
+                                      data-title="Terima Barang?" 
+                                      data-text="Pastikan barang fisik sudah sampai. Status akan menjadi DITERIMA." 
+                                      data-color="#16a34a">
+                                    @csrf @method('PUT')
+                                    <input type="hidden" name="status" value="received">
+                                    <button type="submit" style="background-color: #16a34a;" class="px-4 py-2 text-white rounded font-bold hover:opacity-90">
+                                        📦 Barang Diterima (Selesai)
+                                    </button>
+                                </form>
+                            @elseif($restock->status == 'received')
+                                <button type="button" style="background-color: #166534; cursor: default;" class="px-4 py-2 text-white rounded font-bold" disabled>
+                                    ✔ Selesai (Diterima)
+                                </button>
+                            @else
+                                <button type="button" style="background-color: #d1d5db; cursor: not-allowed;" class="px-4 py-2 text-gray-500 rounded font-bold" disabled title="Ubah status ke 'Sedang Dikirim' dulu">
+                                    📦 Barang Diterima
+                                </button>
+                            @endif
+                        </div>
+                    @endif
+
+                    @if($restock->status == 'received')
+                        <p class="text-xs text-green-600 mt-4 font-bold border-t pt-2">
+                            ✔ Proses Restock Selesai. Silakan buat Transaksi Masuk untuk menambah stok fisik.
+                        </p>
+                    @endif
 
                 @else
                     <p class="text-gray-500 italic">Tidak ada tindakan yang diperlukan saat ini.</p>
@@ -127,28 +171,5 @@
 
         </div>
     </div>
-
-    @push('scripts')
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            document.querySelectorAll('.action-form').forEach(form => {
-                form.addEventListener('submit', function(e) {
-                    e.preventDefault();
-                    Swal.fire({
-                        title: 'Proses Status?',
-                        text: "Status pesanan akan diperbarui.",
-                        icon: 'question',
-                        showCancelButton: true,
-                        confirmButtonColor: '#3085d6',
-                        cancelButtonColor: '#d33',
-                        confirmButtonText: 'Ya, Lanjutkan!',
-                        cancelButtonText: 'Batal'
-                    }).then((result) => {
-                        if (result.isConfirmed) form.submit();
-                    });
-                });
-            });
-        });
-    </script>
-    @endpush
-</x-app-layout>
+    
+    </x-app-layout>

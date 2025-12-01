@@ -117,7 +117,7 @@ class RestockController extends Controller
                 return back()->with('error', 'Status tidak valid untuk Supplier.');
             }
         } 
-        elseif ($user->role == 'manager') {
+        elseif ($user->role == 'manager' || $user->role == 'admin') {
             if ($newStatus == 'in_transit' && $restock->status != 'confirmed') {
                 return back()->with('error', 'Pesanan harus dikonfirmasi supplier dulu.');
             }

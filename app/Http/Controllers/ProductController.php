@@ -9,10 +9,52 @@ use Illuminate\Support\Facades\Storage;
 
 class ProductController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $products = Product::with('category')->latest()->paginate(10);
-        return view('products.index', compact('products'));
+        $query = Product::with('category');
+
+        // 1. SEARCH
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                  ->orWhere('sku', 'like', "%{$search}%");
+            });
+        }
+
+        // 2. FILTER KATEGORI
+        if ($request->filled('category_id')) {
+            $query->where('category_id', $request->category_id);
+        }
+
+        // 3. FILTER STATUS STOK
+        if ($request->filled('stock_status')) {
+            if ($request->stock_status == 'out_of_stock') {
+                $query->where('stock', 0);
+            } elseif ($request->stock_status == 'low_stock') {
+                $query->whereColumn('stock', '<=', 'min_stock')->where('stock', '>', 0);
+            } elseif ($request->stock_status == 'available') {
+                $query->whereColumn('stock', '>', 'min_stock');
+            }
+        }
+
+        // 4. SORTING 
+        $sort = $request->get('sort', 'created_at'); 
+        $direction = $request->get('direction', 'desc'); 
+
+        $allowedSorts = ['name', 'stock', 'selling_price', 'created_at'];
+        $allowedDirections = ['asc', 'desc'];
+
+        if (in_array($sort, $allowedSorts) && in_array($direction, $allowedDirections)) {
+            $query->orderBy($sort, $direction);
+        } else {
+            $query->latest(); 
+        }
+
+        $products = $query->paginate(10)->appends($request->all());
+        $categories = Category::all();
+
+        return view('products.index', compact('products', 'categories'));
     }
 
     /**

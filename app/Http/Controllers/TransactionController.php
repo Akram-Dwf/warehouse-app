@@ -16,11 +16,44 @@ class TransactionController extends Controller
     {
         $query = Transaction::with(['user', 'supplier']);
 
-        if ($request->has('type') && in_array($request->type, ['incoming', 'outgoing'])) {
+        // 1. FILTER 
+        if ($request->filled('type')) {
             $query->where('type', $request->type);
         }
+        if ($request->filled('status')) {
+            $query->where('status', $request->status);
+        }
+        if ($request->filled('start_date')) {
+            $query->whereDate('date', '>=', $request->start_date);
+        }
+        if ($request->filled('end_date')) {
+            $query->whereDate('date', '<=', $request->end_date);
+        }
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function($q) use ($search) {
+                $q->where('customer_name', 'like', "%{$search}%")
+                  ->orWhereHas('supplier', function($subQ) use ($search) {
+                      $subQ->where('name', 'like', "%{$search}%");
+                  })
+                  ->orWhere('reference_number', 'like', "%{$search}%");
+            });
+        }
 
-        $transactions = $query->latest()->paginate(10);
+        // 2. SORTING
+        $sort = $request->get('sort', 'created_at');
+        $direction = $request->get('direction', 'desc');
+
+        $allowedSorts = ['date', 'reference_number', 'created_at'];
+        $allowedDirections = ['asc', 'desc'];
+
+        if (in_array($sort, $allowedSorts) && in_array($direction, $allowedDirections)) {
+            $query->orderBy($sort, $direction);
+        } else {
+            $query->latest();
+        }
+
+        $transactions = $query->paginate(10)->appends($request->all());
 
         return view('transactions.index', compact('transactions'));
     }

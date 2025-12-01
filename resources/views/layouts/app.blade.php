@@ -87,7 +87,7 @@
                     });
                 });
 
-                // --- 3. KONFIRMASI APPROVE (Setujui) ---
+                // --- 3. KONFIRMASI APPROVE (Untuk Transaksi Manager) ---
                 const approveForms = document.querySelectorAll('.approve-form');
                 approveForms.forEach(form => {
                     form.addEventListener('submit', function(e) {
@@ -109,7 +109,7 @@
                     });
                 });
 
-                // --- 4. KONFIRMASI REJECT (Tolak) ---
+                // --- 4. KONFIRMASI REJECT (Untuk Transaksi Manager) ---
                 const rejectForms = document.querySelectorAll('.reject-form');
                 rejectForms.forEach(form => {
                     form.addEventListener('submit', function(e) {
@@ -131,7 +131,35 @@
                     });
                 });
 
+                const confirmForms = document.querySelectorAll('.confirm-form');
+                confirmForms.forEach(form => {
+                    form.addEventListener('submit', function(e) {
+                        e.preventDefault();
+                        
+                        const title = this.getAttribute('data-title') || 'Konfirmasi Tindakan?';
+                        const text = this.getAttribute('data-text') || 'Lanjutkan proses ini?';
+                        const color = this.getAttribute('data-color') || '#3085d6';
+
+                        Swal.fire({
+                            title: title,
+                            text: text,
+                            icon: 'question',
+                            showCancelButton: true,
+                            confirmButtonColor: color,
+                            cancelButtonColor: '#6b7280',
+                            confirmButtonText: 'Ya, Lanjutkan!',
+                            cancelButtonText: 'Batal'
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                this.submit();
+                            }
+                        });
+                    });
+                });
+
             });
         </script>
+        
+        @stack('scripts')
     </body>
 </html>
