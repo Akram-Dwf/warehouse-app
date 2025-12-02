@@ -89,7 +89,7 @@ Pastikan Anda sudah menginstall:
 
 ### 2. Clone & Install
 # Clone repository
-git clone [https://github.com/username-anda/warehouse-app.git](https://github.com/username-anda/warehouse-app.git)
+git clone [https://github.com/Akram-Dwf/warehouse-app.git](https://github.com/Akram-Dwf/warehouse-app.git)
 
 # Masuk ke direktori
 cd warehouse-app
