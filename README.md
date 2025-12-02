@@ -1,59 +1,149 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# 📦 INVENTRA - Warehouse Management System
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+![Inventra Banner](public/screenshots/login-page.png)
 
-## About Laravel
+**Sistem Manajemen Gudang Terintegrasi (Enterprise Grade)**
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+## 📖 Tentang Proyek
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+**Inventra** adalah aplikasi web berbasis **Laravel 12** yang dirancang untuk mendigitalisasi dan mengoptimalkan operasional gudang. Sistem ini memfasilitasi kolaborasi *real-time* antara **Admin, Warehouse Manager, Staff Gudang,** dan **Supplier** dalam satu platform terpusat.
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+Sistem ini menangani siklus inventori lengkap mulai dari pemesanan barang ke supplier (PO), penerimaan barang, pengelolaan stok, hingga pengiriman barang keluar.
 
-## Learning Laravel
+---
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework. You can also check out [Laravel Learn](https://laravel.com/learn), where you will be guided through building a modern Laravel application.
+## 🚀 Fitur Utama & Keunggulan
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+### 1. Keamanan & Akses Kontrol (RBAC)
+* **Multi-Role System:** Membedakan hak akses secara ketat untuk 4 role (Admin, Manager, Staff, Supplier).
+* **Secure Authentication:** Menggunakan Laravel Breeze dengan keamanan tambahan.
+* **Approval Registration:** Supplier baru tidak bisa login sebelum disetujui oleh Admin.
+* **Role-Based Redirection:** Setiap role memiliki dashboard khusus dengan data yang relevan.
 
-## Laravel Sponsors
+### 2. Manajemen Produk Canggih
+* **Data Lengkap:** Mencatat SKU, Harga Beli/Jual, Lokasi Rak, Unit, dan Gambar Produk.
+* **Stock Alert System:** Indikator visual otomatis (Merah/Hijau) dan tabel peringatan di dashboard jika stok berada di bawah batas minimum.
+* **Transaction History:** Melacak 5 riwayat keluar-masuk per item di halaman detail produk.
+* **Smart Filtering:** Pencarian canggih berdasarkan Nama/SKU, Kategori, Status Stok, dan Sorting dinamis.
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+### 3. Manajemen Transaksi (In/Out)
+* **Dynamic Input:** Staff dapat menginput banyak barang sekaligus dalam satu transaksi (Multi-item).
+* **Approval Workflow:** Stok barang **TIDAK** berubah sebelum transaksi disetujui (*Approve*) oleh Manager.
+* **Validasi Ketat:**
+    * Mencegah stok minus saat barang keluar.
+    * Mencegah penghapusan transaksi yang sudah diproses.
+    * Staff hanya bisa menghapus transaksi buatan sendiri yang masih *Pending*.
+* **Separate Tabs:** Pemisahan tampilan tab yang jelas antara Barang Masuk dan Barang Keluar.
 
-### Premium Partners
+### 4. Restock Management (Purchase Order)
+* **Full Cycle PO:** Pembuatan PO -> Konfirmasi Supplier -> Pengiriman (*In Transit*) -> Penerimaan (*Received*).
+* **Role Validation:** Supplier hanya bisa Konfirmasi/Tolak, Manager hanya bisa Update Status Pengiriman.
+* **Seamless Integration:** Saat barang diterima (*Received*), Staff mendapatkan notifikasi di dashboard dan dapat memprosesnya menjadi **Transaksi Masuk** dengan satu klik (*Auto-fill* data dari PO).
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+---
 
-## Contributing
+## 🛠️ Teknologi yang Digunakan
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+| Kategori | Teknologi |
+| :--- | :--- |
+| **Framework** | Laravel 12 (PHP 8.2+) |
+| **Database** | MySQL |
+| **Frontend** | Blade Templates, Tailwind CSS (via Vite) |
+| **Authentication** | Laravel Breeze |
+| **Interactivity** | Alpine.js, Vanilla JS |
+| **Alerts/Modal** | SweetAlert2 (Global Integration) |
+| **Icons** | FontAwesome 6 Free |
 
-## Code of Conduct
+---
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+## 📸 Galeri Aplikasi
 
-## Security Vulnerabilities
+### Dashboard Statistik (Admin/Manager)
+Menampilkan ringkasan total aset, produk, dan tabel peringatan stok menipis.
+![Dashboard](public/screenshots/dashboard-admin.png)
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+### Manajemen Produk & Stok
+Tabel interaktif dengan Search, Filter Kategori, dan Sorting canggih.
+![Product List](public/screenshots/product-list.png)
 
-## License
+### Transaksi Barang (Masuk/Keluar)
+Pemisahan tab yang jelas antara barang masuk dan keluar, serta status badge.
+![Transaction List](public/screenshots/transaction-list.png)
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+### Detail Restock & Approval
+Alur persetujuan pesanan dengan tombol aksi yang dinamis sesuai status.
+![Restock Detail](public/screenshots/restock-detail.png)
+
+---
+
+## ⚙️ Panduan Instalasi
+
+Ikuti langkah-langkah berikut untuk menjalankan proyek ini di komputer lokal Anda:
+
+### 1. Persiapan Awal
+Pastikan Anda sudah menginstall:
+* PHP >= 8.2
+* Composer
+* Node.js & NPM
+* MySQL (XAMPP/Laragon)
+
+### 2. Clone & Install
+# Clone repository
+git clone [https://github.com/username-anda/warehouse-app.git](https://github.com/username-anda/warehouse-app.git)
+
+# Masuk ke direktori
+cd warehouse-app
+
+# Install dependensi backend
+composer install
+
+# Install dependensi frontend
+npm install
+
+### 3. Konfigurasi Environment
+Duplikat file `.env.example` menjadi `.env` dan sesuaikan database Anda:
+
+```bash
+DB_CONNECTION=mysql
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_DATABASE=warehouse_db  # Sesuaikan nama database
+DB_USERNAME=root
+DB_PASSWORD=
+
+```
+
+### 4. Setup Database
+Generate key aplikasi dan jalankan migrasi + seeder:
+```bash
+php artisan key:generate
+php artisan migrate:fresh --seed
+```
+Catatan: Perintah ini akan otomatis membuat database (jika belum ada) dan mengisi data akun dummy untuk semua role.
+
+### 5. Menjalankan Aplikasi
+Buka dua terminal terpisah untuk menjalankan server PHP dan Vite (CSS/JS):
+
+Terminal 1 (Laravel Server):
+```bash
+php artisan serve
+```
+Terminal 2 (Vite Build/Dev):
+```bash
+npm run dev
+```
+Akses aplikasi di browser melalui: http://127.0.0.1:8000
+
+## 🔐 Akun Demo (Login Credentials)
+
+Berikut adalah akun yang dapat digunakan untuk pengujian sistem.
+**Password untuk semua akun:** `password`
+
+| Role | Email | Akses & Tanggung Jawab |
+| :--- | :--- | :--- |
+| **Administrator** | `admin@gudang.com` | Full Access, Manajemen User, Approve Supplier, Monitoring Aset. |
+| **Manager** | `manager@gudang.com` | Approval Transaksi, Manajemen Restock (PO), Laporan Stok. |
+| **Staff Gudang** | `staff@gudang.com` | Input Transaksi Masuk/Keluar, Cek Fisik Barang Datang. |
+| **Supplier** | `supplier@pt.com` | Melihat PO Masuk, Konfirmasi/Tolak Pesanan. |
+
+Dibuat oleh: Akram Alfadli Tamir - H071241076 - Tugas Final Praktikum Pemrograman Web 2025 - Universitas Hasanuddin
